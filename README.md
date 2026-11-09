@@ -20,27 +20,33 @@ Live site: <https://coltonkawamura.github.io/modelleague/>
   wins the season. Optional point-bets on predictions settle automatically.
 
 No real money, ever. Full rules on the site; the complete design is in
-[`docs/SPEC.md`](docs/SPEC.md).
+[`SPEC.md`](SPEC.md).
 
 ## Repository layout
 
 ```
+SPEC.md                 The full game spec (design, prior art, phases).
+                        Lives in the repo root on purpose: GitHub Pages
+                        serves docs/, so a root-level file is never public.
+
 data/
-  league.json           THE data: site settings, both leagues (teams, pools,
-                        standings, weeks), and the scoring table. One file.
+  league.json           THE data: site settings (including the password-gate
+                        hash), both leagues (teams, pools, standings, weeks),
+                        and the scoring table. One file.
 
 site/
   build.py              Renders every page into docs/ from league.json.
                         Standard library only, no dependencies.
   assets/style.css      The site's stylesheet (copied verbatim into docs/).
+  assets/gate.js        The password gate: verifies the entered password
+                        against the SHA-256 hash from league.json and
+                        releases the page for the browser session.
 
 docs/                   The built site. Committed; GitHub Pages serves
                         `main /docs`. Do not hand-edit — regenerate.
 
-docs? no — above.
-.github/workflows/ci.yml  Rebuilds on push/PR and fails if docs/ drifted.
-
-docs/SPEC.md            The full game spec (design, prior art, phases).
+.github/workflows/ci.yml    Rebuilds on push/PR and fails if docs/ drifted.
+.github/workflows/deploy.yml  Publishes docs/ to Pages on push to main.
 ```
 
 ## Build

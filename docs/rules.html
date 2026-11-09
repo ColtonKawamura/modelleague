@@ -4,9 +4,37 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Rules — ModelLeague</title>
+<script>
+  (function () {
+    var g = {"enabled": true, "sha256": "25c6377e426f16e47936ab0193fdd98acf137ba2a4491aee08e0d8dc774d55a6"};
+    window.__ML_GATE__ = g;
+    if (g.enabled && g.sha256) {
+      try {
+        if (sessionStorage.getItem("modelleague-auth") !== "1") {
+          document.documentElement.classList.add("gated");
+        }
+      } catch (e) {}
+    }
+  })();
+</script>
 <link rel="stylesheet" href="assets/style.css">
+<script src="assets/gate.js" defer></script>
 </head>
 <body class="">
+<div class="gate" id="ml-gate">
+  <form class="gate-box" id="ml-gate-form" autocomplete="off">
+    <div class="gate-logo">ModelLeague</div>
+    <h1>Members only</h1>
+    <p class="gate-sub">This league is private. Enter the password to see the
+    boards.</p>
+    <input type="password" id="ml-gate-pass" name="password"
+           placeholder="Password" required>
+    <button type="submit">Enter</button>
+    <p class="gate-error" id="ml-gate-error" hidden>Wrong password &mdash; try
+    again.</p>
+    <p class="gate-foot">Forgot it? Ask the league owner.</p>
+  </form>
+</div>
 <header>
   <div class="wrap header-inner">
     <a class="brand" href="">ModelLeague</a>

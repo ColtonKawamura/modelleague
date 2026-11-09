@@ -26,6 +26,7 @@ PAGES = [
     "frontier/index.html",
     "open/index.html",
     "assets/style.css",
+    "assets/gate.js",
 ]
 
 
@@ -44,9 +45,12 @@ def points_badge(points):
     return '<span class="pts %s">%s%d</span>' % (cls, sign, abs(points))
 
 
-def doc(prefix, title, body, league_class=""):
+def doc(prefix, title, body, league_class="", gate_json="{}"):
     """Wrap a page body in the shared header/footer. `prefix` is '' at the
-    site root and '../' from subpages, so all links stay relative."""
+    site root and '../' from subpages, so all links stay relative. The inline
+    head script runs before first paint: if the password gate is on and this
+    browser session is not authenticated, it marks <html> as gated and the
+    CSS hides the league content, leaving only the lock screen."""
     nav = [
         ("Home", "%s" % prefix),
         ("Frontier", "%sfrontier/" % prefix),
@@ -61,9 +65,37 @@ def doc(prefix, title, body, league_class=""):
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>%s</title>
+<script>
+  (function () {
+    var g = %s;
+    window.__ML_GATE__ = g;
+    if (g.enabled && g.sha256) {
+      try {
+        if (sessionStorage.getItem("modelleague-auth") !== "1") {
+          document.documentElement.classList.add("gated");
+        }
+      } catch (e) {}
+    }
+  })();
+</script>
 <link rel="stylesheet" href="%sassets/style.css">
+<script src="%sassets/gate.js" defer></script>
 </head>
 <body class="%s">
+<div class="gate" id="ml-gate">
+  <form class="gate-box" id="ml-gate-form" autocomplete="off">
+    <div class="gate-logo">ModelLeague</div>
+    <h1>Members only</h1>
+    <p class="gate-sub">This league is private. Enter the password to see the
+    boards.</p>
+    <input type="password" id="ml-gate-pass" name="password"
+           placeholder="Password" required>
+    <button type="submit">Enter</button>
+    <p class="gate-error" id="ml-gate-error" hidden>Wrong password &mdash; try
+    again.</p>
+    <p class="gate-foot">Forgot it? Ask the league owner.</p>
+  </form>
+</div>
 <header>
   <div class="wrap header-inner">
     <a class="brand" href="%s">ModelLeague</a>
@@ -85,7 +117,18 @@ def doc(prefix, title, body, league_class=""):
 </footer>
 </body>
 </html>
-""" % (esc(title), prefix, league_class, prefix, nav_html, body, prefix, prefix)
+""" % (
+        esc(title),
+        gate_json,
+        prefix,
+        prefix,
+        league_class,
+        prefix,
+        nav_html,
+        body,
+        prefix,
+        prefix,
+    )
 
 
 def banner(data):
@@ -97,7 +140,7 @@ def banner(data):
     )
 
 
-def home(data):
+def home(data, gate_json):
     s = data["site"]
     leagues_html = ""
     for lid in ("frontier", "open"):
@@ -179,10 +222,10 @@ def home(data):
   <div class="cards">%s</div>
 </section>
 """ % (banner(data), esc(s["tagline"]), esc(s["contact"]), leagues_html)
-    return doc("", "ModelLeague — fantasy football for large language models", body)
+    return doc("", "ModelLeague — fantasy football for large language models", body, gate_json=gate_json)
 
 
-def rules(data):
+def rules(data, gate_json):
     sc = data["scoring"]
     event_rows = "".join(
         "<tr><td>%s</td><td class='num'>%s</td></tr>" % (esc(e["event"]), points_badge(e["points"]))
@@ -295,10 +338,10 @@ def rules(data):
   </ul>
 </section>
 """ % (banner(data), event_rows)
-    return doc("", "Rules — ModelLeague", body)
+    return doc("", "Rules — ModelLeague", body, gate_json=gate_json)
 
 
-def methodology(data):
+def methodology(data, gate_json):
     sc = data["scoring"]
     comp_rows = "".join(
         "<tr><td><strong>%s</strong> &mdash; %d%%</td><td>%s</td></tr>"
@@ -386,10 +429,10 @@ def methodology(data):
   </ul>
 </section>
 """ % (banner(data), comp_rows)
-    return doc("", "The Index — ModelLeague", body)
+    return doc("", "The Index — ModelLeague", body, gate_json=gate_json)
 
 
-def league_page(data, lid):
+def league_page(data, lid, gate_json):
     lg = data["leagues"][lid]
     prefix = "../"
     cls = "league-frontier" if lid == "frontier" else "league-open"
@@ -471,11 +514,15 @@ def league_page(data, lid):
   </ol>
 </section>
 """ % (banner(data), esc(lg["name"]), esc(lg["slugline"]), team_rows, esc(lg["pool_status"]), pool_rows, standings)
-    return doc(prefix, "%s — ModelLeague" % lg["name"], body, league_class=cls)
+    return doc(prefix, "%s — ModelLeague" % lg["name"], body, league_class=cls, gate_json=gate_json)
 
 
 def build(out_dir):
     data = load_data()
+    s = data["site"]
+    gate_json = json.dumps(
+        {"enabled": bool(s.get("gate_enabled", False)), "sha256": s.get("gate_sha256")}
+    )
     out_dir = pathlib.Path(out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
     (out_dir / "frontier").mkdir(parents=True, exist_ok=True)
@@ -483,11 +530,11 @@ def build(out_dir):
     (out_dir / "assets").mkdir(parents=True, exist_ok=True)
 
     pages = {
-        "index.html": home(data),
-        "rules.html": rules(data),
-        "methodology.html": methodology(data),
-        "frontier/index.html": league_page(data, "frontier"),
-        "open/index.html": league_page(data, "open"),
+        "index.html": home(data, gate_json),
+        "rules.html": rules(data, gate_json),
+        "methodology.html": methodology(data, gate_json),
+        "frontier/index.html": league_page(data, "frontier", gate_json),
+        "open/index.html": league_page(data, "open", gate_json),
     }
     for rel, content in pages.items():
         path = out_dir / rel
@@ -495,11 +542,12 @@ def build(out_dir):
         path.write_text(content, encoding="utf-8")
 
     shutil.copyfile(ASSETS_DIR / "style.css", out_dir / "assets" / "style.css")
+    shutil.copyfile(ASSETS_DIR / "gate.js", out_dir / "assets" / "gate.js")
 
     for rel in PAGES:
         if not (out_dir / rel).exists():
             raise SystemExit("build error: missing %s" % rel)
-    print("rendered %d pages into %s" % (len(PAGES) - 1, out_dir))
+    print("rendered %d pages into %s" % (len(pages), out_dir))
 
 
 def main():
