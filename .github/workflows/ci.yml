@@ -1,0 +1,22 @@
+name: build
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Rebuild the site from data/league.json
+        run: python3 site/build.py
+      - name: Check docs/ matches the data
+        run: |
+          if ! git diff --exit-code -- docs/; then
+            echo "::error::docs/ drifted from data/league.json — run 'python3 site/build.py' and commit the result"
+            exit 1
+          fi

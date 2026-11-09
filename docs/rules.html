@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rules — ModelLeague</title>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body class="">
+<header>
+  <div class="wrap header-inner">
+    <a class="brand" href="">ModelLeague</a>
+    <nav class="nav"><a href="">Home</a><a href="frontier/">Frontier</a><a href="open/">Open Source</a><a href="rules.html">Rules</a><a href="methodology.html">The Index</a></nav>
+  </div>
+</header>
+<main class="wrap">
+
+<div class="banner"><strong>Season 1 &middot; preseason</strong> &mdash; pools are provisional and the baseline is not yet set. Data as of 2026-11-09.</div>
+<section>
+  <h1>Rules</h1>
+  <p class="lede">The whole rulebook, in plain language. The scoring numbers
+  below are the published ones &mdash; the weekly tick scores against them.</p>
+</section>
+
+<section>
+  <h2>The draft</h2>
+  <ul>
+    <li>One snake draft per league: five teams, five rounds, 25 picks. Snake
+    order (last pick in round one goes first in round two).</li>
+    <li>The pool is frozen at the draft from the data feeds. Every model in the
+    pool can be owned by <strong>exactly one</strong> team &mdash; there is no duplication,
+    so the strongest models are gone by the first round and everyone else has
+    to diversify.</li>
+    <li>A model that ships <em>after</em> the draft does not re-draft; it hits the
+    waiver wire (below).</li>
+  </ul>
+</section>
+
+<section>
+  <h2>The roster</h2>
+  <ul>
+    <li>Each team owns <strong>five</strong> models.</li>
+    <li>Every week the <strong>four</strong> highest-scoring models on your roster
+    auto-start; the fifth sits on the bench. There are no start/sit calls to
+    make &mdash; the week decides.</li>
+  </ul>
+</section>
+
+<section>
+  <h2>Weekly scoring</h2>
+  <p>Each model gets an <a href="methodology.html">Index score from 0 to 100</a>
+  every week. A model's weekly fantasy points are its Index score (an 87 means
+  8.7 points), plus the event modifiers below, which come from that week's
+  news:</p>
+  <table>
+    <thead><tr><th>Event</th><th>Points</th></tr></thead>
+    <tbody><tr><td>New release or major update (one-time debut bonus)</td><td class='num'><span class="pts pos">+15</span></td></tr><tr><td>Takes #1 on a named benchmark</td><td class='num'><span class="pts pos">+10</span></td></tr><tr><td>Sits in the LMArena top 3</td><td class='num'><span class="pts pos">+5</span></td></tr><tr><td>Cuts its price</td><td class='num'><span class="pts pos">+8</span></td></tr><tr><td>Adoption milestone (e.g. 10M downloads)</td><td class='num'><span class="pts pos">+6</span></td></tr><tr><td>Deprecated or end-of-lifed</td><td class='num'><span class="pts neg">-20</span></td></tr><tr><td>Major incident (outage, recall, or scandal in the press)</td><td class='num'><span class="pts neg">-10</span></td></tr></tbody>
+  </table>
+  <p class="aside">Event modifiers are one-time for the event that triggers
+  them (a release bonus pays once; the top-3 arena bonus repeats each week the
+  model stays in the top 3).</p>
+</section>
+
+<section>
+  <h2>New models</h2>
+  <ul>
+    <li><strong>Waiver wire.</strong> A brand-new model goes to the waiver wire,
+    claimed in strict order: last-place team first, then up the standings.
+    Claiming closes at the weekly tick.</li>
+    <li><strong>It costs a slot.</strong> A new model takes a bench spot, or you
+    drop someone to make room. If you pass, the next team in line gets a
+    chance. Only one team can own a model, so a hot release is a race down the
+    priority list.</li>
+    <li><strong>The debut bonus.</strong> A brand-new model earns the +15 release
+    bonus in its first week &mdash; front-running the hype is a real strategy.</li>
+    <li><strong>Upgrades keep ownership.</strong> A major version of a model you
+    already own (Claude X &rarr; Claude X.5) is the <em>same</em> player: nobody else can
+    take it, and <em>you</em> collect the +15 and the rating jump. A minor patch is
+    the same player with no bonus &mdash; just a normal score wobble.</li>
+    <li><strong>Unwanted models sit.</strong> A release nobody claims stays on the
+    wire, offered again each week, until someone wants it.</li>
+  </ul>
+</section>
+
+<section>
+  <h2>Trades</h2>
+  <ul>
+    <li>Teams may trade models with each other, freely, by negotiation.</li>
+    <li>Trades lock in at the next weekly tick and score from that week.</li>
+    <li>The league owner is the referee: a trade is valid when both sides say
+    yes and the owner posts it.</li>
+  </ul>
+</section>
+
+<section>
+  <h2>Betting</h2>
+  <ul>
+    <li>Each week, players may bet their league points on predictions:
+    direction (up/down on a model's Index), matchups (will A out-score B?),
+    sleepers (will a non-top-5 model crack the top 5 by week N?), and the
+    season champion.</li>
+    <li>Bets settle automatically from the next week's data, with the source
+    cited. No disputes: the Index formula and the published data are the
+    referee.</li>
+    <li>Point balances are bragging rights plus small perks (waiver priority,
+    a &ldquo;scout&rdquo; peek at the next week's preview). <strong>No real money, ever.</strong></li>
+  </ul>
+</section>
+
+<section>
+  <h2>The season</h2>
+  <ul>
+    <li><strong>13 weeks</strong>, one tick each Sunday evening. The season
+    champion is the team with the most total points; ties break by most
+    weekly wins, then by fewest points against.</li>
+    <li>An unfilled founder slot is taken by a <strong>bot team</strong> that drafts
+    on the value component of the Index, so a four-human league still runs a
+    full snake.</li>
+    <li>After the season: redraft. Pools, rosters and the Index baseline all
+    reset; point balances carry over as bragging rights.</li>
+  </ul>
+</section>
+
+</main>
+<footer>
+  <div class="wrap">
+    ModelLeague is a points-only game: no real money, ever. Every number on
+    this site is dated and sourced; the rules and the scoring formula are
+    public. Built by Colton Kawamura.
+    <a href="https://github.com/ColtonKawamura/modelleague">Repository</a>
+    &middot; <a href="rules.html">Rules</a>
+    &middot; <a href="methodology.html">The Index</a>
+  </div>
+</footer>
+</body>
+</html>

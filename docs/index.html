@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ModelLeague — fantasy football for large language models</title>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body class="">
+<header>
+  <div class="wrap header-inner">
+    <a class="brand" href="">ModelLeague</a>
+    <nav class="nav"><a href="">Home</a><a href="frontier/">Frontier</a><a href="open/">Open Source</a><a href="rules.html">Rules</a><a href="methodology.html">The Index</a></nav>
+  </div>
+</header>
+<main class="wrap">
+
+<div class="banner"><strong>Season 1 &middot; preseason</strong> &mdash; pools are provisional and the baseline is not yet set. Data as of 2026-11-09.</div>
+<section class="hero">
+  <h1>Fantasy football, but for large language models.</h1>
+  <p class="lede">You and a few friends draft real AI models. Every week, how those
+  models are <em>actually doing</em> &mdash; benchmarks, prices, news &mdash; becomes
+  your team's score. Two leagues: one for closed frontier models, one for open
+  weights.</p>
+</section>
+
+<section>
+  <h2>How it works</h2>
+  <ol class="steps">
+    <li><strong>You draft AI models.</strong> On draft night you and your
+    league-mates take turns picking from a list of real models &mdash; GPT, Claude,
+    Gemini, DeepSeek, Llama, and the rest &mdash; until you each own five.
+    Each model can be owned by exactly one person, so the hot ones get sniped.</li>
+    <li><strong>Every week, each model gets a score out of 100.</strong> The score
+    &mdash; <a href="methodology.html">the Index</a> &mdash; measures how good the model is
+    <em>right now</em>: how well it does on the standard tests, how much it costs,
+    whether it is getting better than last week, and whether people are using it.</li>
+    <li><strong>Your team's points are the scores of your four best models,
+    added up.</strong> On top of that, news moves the score: a new version
+    releases (+15), a model takes the top of a big test (+10), a price cut (+8).
+    Penalties too: a model gets shut down (&minus;20) or has a scandal (&minus;10).
+    Your fifth model sits on the bench.</li>
+    <li><strong>Most points that week wins the week. Most points over
+    13 weeks wins the season.</strong> That is the whole game.</li>
+    <li><strong>Optional: bet points on predictions.</strong> &ldquo;Will GPT-6.1 go up
+    or down next week?&rdquo; &ldquo;Which model leads the Index at the end of the
+    season?&rdquo; Bets settle automatically from the next week's data. Bragging
+    rights and small perks &mdash; never real money.</li>
+  </ol>
+</section>
+
+<section>
+  <h2>How to get started</h2>
+  <ol class="steps">
+    <li><strong>Claim a founder spot.</strong> Each league has five slots and
+    first come, first served: open an issue on the repo with your team name, or message Colton directly. You can run a team in both leagues if you
+    want &mdash; it is just double the drafts.</li>
+    <li><strong>Pick a team name.</strong> Send it with your claim. A good name
+    helps; it is the only requirement.</li>
+    <li><strong>Show up to the draft.</strong> One snake draft, five rounds,
+    about an hour. You do not need to be an LLM expert &mdash; the Index table
+    tells you what each model is worth at the moment.</li>
+    <li><strong>Then every Sunday a new week lands on this site:</strong> the
+    scores, the news that caused them, the standings, and settled bets. If you
+    play, that is your result. If you only follow, that is your model-news
+    digest.</li>
+  </ol>
+  <p class="aside">Not playing? The site still works as a spectator: the Index
+  table and the weekly review are the product, and the league is the reason to
+  come back.</p>
+</section>
+
+<section>
+  <h2>The leagues</h2>
+  <div class="cards">  <a class="card league-card card-frontier" href="frontier/">
+    <div class="card-title">Frontier League</div>
+    <div class="card-sub">Closed lab models — the flagships you can only use through an API.</div>
+    <div class="card-meta">9 candidate models &middot; 5 of 5 founder spots open</div>
+  </a>
+  <a class="card league-card card-open" href="open/">
+    <div class="card-title">Open Source League</div>
+    <div class="card-sub">Open-weight models — the ones you can download and run yourself.</div>
+    <div class="card-meta">9 candidate models &middot; 5 of 5 founder spots open</div>
+  </a>
+</div>
+</section>
+
+</main>
+<footer>
+  <div class="wrap">
+    ModelLeague is a points-only game: no real money, ever. Every number on
+    this site is dated and sourced; the rules and the scoring formula are
+    public. Built by Colton Kawamura.
+    <a href="https://github.com/ColtonKawamura/modelleague">Repository</a>
+    &middot; <a href="rules.html">Rules</a>
+    &middot; <a href="methodology.html">The Index</a>
+  </div>
+</footer>
+</body>
+</html>

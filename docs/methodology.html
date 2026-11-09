@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Index — ModelLeague</title>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body class="">
+<header>
+  <div class="wrap header-inner">
+    <a class="brand" href="">ModelLeague</a>
+    <nav class="nav"><a href="">Home</a><a href="frontier/">Frontier</a><a href="open/">Open Source</a><a href="rules.html">Rules</a><a href="methodology.html">The Index</a></nav>
+  </div>
+</header>
+<main class="wrap">
+
+<div class="banner"><strong>Season 1 &middot; preseason</strong> &mdash; pools are provisional and the baseline is not yet set. Data as of 2026-11-09.</div>
+<section>
+  <h1>The Index</h1>
+  <p class="lede">One number, per model, per week, from 0 to 100. This is the
+  page that makes the betting fair: the formula is public, every input is dated
+  and sourced, and a failed source shows up as a gap instead of a silent
+  &ldquo;no change.&rdquo;</p>
+</section>
+
+<section>
+  <h2>The formula</h2>
+  <p><strong>Index = 50%&nbsp;Quality + 25%&nbsp;Value + 15%&nbsp;Momentum + 10%&nbsp;Adoption</strong>,
+  each component normalized to 0&ndash;100 before the weights are applied.</p>
+  <table>
+    <thead><tr><th>Component</th><th>What it measures</th></tr></thead>
+    <tbody><tr><td><strong>Quality</strong> &mdash; 50%</td><td>How well the model does on the standard tests — the Artificial Analysis Intelligence Index, blended with LMArena Elo (the crowd-sourced head-to-head vote).</td></tr><tr><td><strong>Value</strong> &mdash; 25%</td><td>How much you get per dollar. A cheap model that is nearly as good scores high. This is the sleeper lane.</td></tr><tr><td><strong>Momentum</strong> &mdash; 15%</td><td>Week-over-week movement in the composite. A model that is climbing gets a boost; one that is fading gets docked.</td></tr><tr><td><strong>Adoption</strong> &mdash; 10%</td><td>Download and usage growth, from the Hugging Face API (open models) or vendor announcements (frontier). Capped, so hype cannot dominate.</td></tr></tbody>
+  </table>
+</section>
+
+<section>
+  <h2>Where the inputs come from</h2>
+  <ul>
+    <li><strong>Quality:</strong> the
+    <a href="https://artificialanalysis.ai">Artificial Analysis</a> Intelligence
+    Index where published, blended with
+    <a href="https://lmarena.ai">LMArena</a> Elo (the crowd-sourced
+    head-to-head vote) for the feel component.</li>
+    <li><strong>Value:</strong> the Index score divided into the published API
+    price per million tokens (frontier) or the self-hosting cost class (open).
+    Vendor pricing pages are the source.</li>
+    <li><strong>Momentum:</strong> this week's composite minus last week's, from
+    the site's own archive &mdash; the week files are append-only.</li>
+    <li><strong>Adoption:</strong> the Hugging Face API for download growth on
+    open models; vendor announcements and API-usage reporting for frontier.
+    Capped so hype cannot dominate.</li>
+    <li><strong>News events</strong> (the +15/&minus;20 modifiers): vendor news blogs,
+    Hacker News, and r/LocalLLaMA, deduplicated by underlying event and
+    required to cite a primary source.</li>
+  </ul>
+</section>
+
+<section>
+  <h2>The data policy</h2>
+  <ul>
+    <li><strong>Full auto-collection, last-known fallback.</strong> Every tick
+    pulls every source. A source that fails does not become &ldquo;no news&rdquo;: the
+    table shows a <em>coverage gap</em> with the last known value and its date,
+    labeled as stale.</li>
+    <li><strong>Nothing is invented.</strong> A figure without a source and a
+    date is not a figure; it is not rendered. Preseason means no scores at
+    all &mdash; until the baseline is set, the standings are empty by design.</li>
+    <li><strong>Everything is dated and cited.</strong> Each week file records, per
+    input: the value, the source URL, and the fetch status. The weekly review
+    names any coverage gaps in plain words.</li>
+  </ul>
+  <p class="aside">Reference points, so the raw inputs are not abstract: the
+  Artificial Analysis Intelligence Index on 5 Nov 2026 had the top open-weight
+  models at DeepSeek V4.1 Flash (33), GLM-5.3 (32) and MiMo-V2.6-Pro (30), per
+  the <a href="https://hokai.io/guides/best-open-weight-models">hokai.io roundup of
+  5 Nov 2026</a>; the overall index on 8 Nov 2026 had Gemini 4 Carbon at 60,
+  per <a href="https://ylem.si/models/">YLEM's tracker</a>. These are dated
+  snapshots of the raw inputs &mdash; not ModelLeague scores, which start at the
+  Season 1 baseline.</p>
+</section>
+
+<section>
+  <h2>Why this shape makes a good game</h2>
+  <ul>
+    <li><strong>The value component creates the sleeper lane.</strong> A cheap
+    model that is close to the flagships scores well and is the reason nobody
+    has to draft the same three names.</li>
+    <li><strong>Momentum makes weeks matter.</strong> A lab's big release week
+    moves several models at once, so a &ldquo;quiet&rdquo; week and a release week feel
+    different on the scoreboard.</li>
+    <li><strong>News is a score, not a newsletter.</strong> The event modifiers are
+    why the league and the news are the same activity: you follow the models
+    <em>because</em> the follow is the game.</li>
+  </ul>
+</section>
+
+</main>
+<footer>
+  <div class="wrap">
+    ModelLeague is a points-only game: no real money, ever. Every number on
+    this site is dated and sourced; the rules and the scoring formula are
+    public. Built by Colton Kawamura.
+    <a href="https://github.com/ColtonKawamura/modelleague">Repository</a>
+    &middot; <a href="rules.html">Rules</a>
+    &middot; <a href="methodology.html">The Index</a>
+  </div>
+</footer>
+</body>
+</html>
