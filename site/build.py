@@ -555,6 +555,13 @@ def build(out_dir):
     if draft_src.exists():
         draft_dst.write_text(draft_src.read_text(encoding="utf-8"), encoding="utf-8")
 
+    # Copy data file so draft.html can fetch it
+    data_src = ROOT / "data" / "league.json"
+    data_dst = out_dir / "data" / "league.json"
+    if data_src.exists():
+        data_dst.parent.mkdir(parents=True, exist_ok=True)
+        data_dst.write_text(data_src.read_text(encoding="utf-8"), encoding="utf-8")
+
     for rel in PAGES:
         if not (out_dir / rel).exists():
             raise SystemExit("build error: missing %s" % rel)

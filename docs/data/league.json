@@ -1,0 +1,92 @@
+{
+  "_meta": {
+    "schema_version": 1,
+    "note": "ModelLeague state. One record per league in `leagues`; the weekly tick (phase 2) appends to each league's `weeks` and updates `standings`. v0 is preseason: pools are provisional, no scores exist yet."
+  },
+  "site": {
+    "name": "ModelLeague",
+    "tagline": "Fantasy football, but for large language models.",
+    "season": 1,
+    "season_status": "preseason",
+    "as_of": "2026-11-09",
+    "season_weeks": 13,
+    "teams_per_league": 5,
+    "roster_size": 5,
+    "starters": 4,
+    "gate_enabled": true,
+    "gate_sha256": "25c6377e426f16e47936ab0193fdd98acf137ba2a4491aee08e0d8dc774d55a6",
+    "repo": "https://github.com/ColtonKawamura/modelleague",
+    "contact": "open an issue on the repo with your team name, or message Colton directly"
+  },
+  "leagues": {
+    "frontier": {
+      "id": "frontier",
+      "name": "Frontier League",
+      "slugline": "Closed lab models — the flagships you can only use through an API.",
+      "teams": [
+        {"slot": 1, "name": null, "owner": null, "status": "open"},
+        {"slot": 2, "name": null, "owner": null, "status": "open"},
+        {"slot": 3, "name": null, "owner": null, "status": "open"},
+        {"slot": 4, "name": null, "owner": null, "status": "open"},
+        {"slot": 5, "name": null, "owner": null, "status": "open"}
+      ],
+      "pool_status": "Provisional — frozen at the Season 1 draft. The pool is assembled from the data feeds at draft time; a model that ships after the draft hits the waiver wire instead.",
+      "pool": [
+        {"id": "gpt-6-1-sol", "name": "GPT-6.1 Sol", "lab": "OpenAI", "note": null},
+        {"id": "gpt-6-1-terra", "name": "GPT-6.1 Terra", "lab": "OpenAI", "note": null},
+        {"id": "gpt-6-astra", "name": "GPT-6 Astra", "lab": "OpenAI", "note": null},
+        {"id": "claude-opus-5-5", "name": "Claude Opus 5.5", "lab": "Anthropic", "note": null},
+        {"id": "claude-sonnet-5-5", "name": "Claude Sonnet 5.5", "lab": "Anthropic", "note": null},
+        {"id": "claude-fable-5-1", "name": "Claude Fable 5.1", "lab": "Anthropic", "note": null},
+        {"id": "gemini-4-carbon", "name": "Gemini 4 Carbon", "lab": "Google", "note": null},
+        {"id": "gemini-4-argon", "name": "Gemini 4 Argon", "lab": "Google", "note": null},
+        {"id": "gemini-3-1-pro", "name": "Gemini 3.1 Pro", "lab": "Google", "note": null}
+      ],
+      "standings": [],
+      "weeks": []
+    },
+    "open": {
+      "id": "open",
+      "name": "Open Source League",
+      "slugline": "Open-weight models — the ones you can download and run yourself.",
+      "teams": [
+        {"slot": 1, "name": null, "owner": null, "status": "open"},
+        {"slot": 2, "name": null, "owner": null, "status": "open"},
+        {"slot": 3, "name": null, "owner": null, "status": "open"},
+        {"slot": 4, "name": null, "owner": null, "status": "open"},
+        {"slot": 5, "name": null, "owner": null, "status": "open"}
+      ],
+      "pool_status": "Provisional — frozen at the Season 1 draft. The pool is assembled from the data feeds at draft time; a model that ships after the draft hits the waiver wire instead.",
+      "pool": [
+        {"id": "deepseek-v4-1-flash", "name": "DeepSeek V4.1 Flash", "lab": "DeepSeek", "note": null},
+        {"id": "glm-5-3", "name": "GLM-5.3", "lab": "Z.ai (Zhipu)", "note": null},
+        {"id": "kimi-k3-1-pro", "name": "Kimi K3.1 Pro", "lab": "Moonshot AI", "note": null},
+        {"id": "mimo-v2-6-pro", "name": "MiMo-V2.6-Pro", "lab": "Xiaomi", "note": null},
+        {"id": "mistral-large-4", "name": "Mistral Large 4", "lab": "Mistral", "note": null},
+        {"id": "qwen3-8-27b", "name": "Qwen3.8 27B", "lab": "Qwen (Alibaba)", "note": null},
+        {"id": "gemma-4-27b", "name": "Gemma 4 27B", "lab": "Google", "note": null},
+        {"id": "llama-4-maverick", "name": "Llama 4 Maverick", "lab": "Meta", "note": null},
+        {"id": "ling-3-1-flash", "name": "Ling 3.1 Flash", "lab": "InclusionAI", "note": null}
+      ],
+      "standings": [],
+      "weeks": []
+    }
+  },
+  "scoring": {
+    "index_components": [
+      {"key": "quality", "label": "Quality", "weight": 50, "plain": "How well the model does on the standard tests — the Artificial Analysis Intelligence Index, blended with LMArena Elo (the crowd-sourced head-to-head vote)."},
+      {"key": "value", "label": "Value", "weight": 25, "plain": "How much you get per dollar. A cheap model that is nearly as good scores high. This is the sleeper lane."},
+      {"key": "momentum", "label": "Momentum", "weight": 15, "plain": "Week-over-week movement in the composite. A model that is climbing gets a boost; one that is fading gets docked."},
+      {"key": "adoption", "label": "Adoption", "weight": 10, "plain": "Download and usage growth, from the Hugging Face API (open models) or vendor announcements (frontier). Capped, so hype cannot dominate."}
+    ],
+    "events": [
+      {"points": 15, "event": "New release or major update (one-time debut bonus)"},
+      {"points": 10, "event": "Takes #1 on a named benchmark"},
+      {"points": 5, "event": "Sits in the LMArena top 3"},
+      {"points": 8, "event": "Cuts its price"},
+      {"points": 6, "event": "Adoption milestone (e.g. 10M downloads)"},
+      {"points": -20, "event": "Deprecated or end-of-lifed"},
+      {"points": -10, "event": "Major incident (outage, recall, or scandal in the press)"}
+    ]
+  }
+}
