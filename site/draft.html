@@ -88,20 +88,6 @@ h2{font-size:1.25rem;margin-bottom:12px}
 .submit-actions{display:flex;gap:12px;justify-content:center}
 
 /* Auth bar */
-.auth-bar{margin-bottom:24px;padding:16px;background:var(--surface);border:1px solid var(--border);border-radius:10px}
-.auth-bar.connected{border-color:var(--success)}
-.auth-bar h3{font-size:.9rem;margin-bottom:10px}
-.auth-bar .field{margin-bottom:10px}
-.auth-bar .field input{font-family:'SF Mono',Monaco,Consolas,monospace;font-size:.85rem}
-.auth-status{display:flex;align-items:center;gap:8px;font-size:.85rem;color:var(--muted)}
-.auth-dot{width:8px;height:8px;border-radius:50%;background:var(--danger)}
-.auth-dot.ok{background:var(--success)}
-.auth-link{display:block;font-size:.75rem;color:var(--muted);margin-top:6px}
-.auth-link a{color:var(--accent)}
-
-/* Delete team */
-.delete-area{margin-top:16px;padding-top:12px;border-top:1px solid var(--border)}
-.delete-area .btn-danger{font-size:.8rem;padding:6px 14px}
 
 /* Status bar */
 .status-bar{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;background:var(--surface);border:1px solid var(--border);border-radius:8px;margin-bottom:20px;font-size:.85rem}
@@ -113,6 +99,15 @@ h2{font-size:1.25rem;margin-bottom:12px}
 .toast.show{transform:translateY(0)}
 .toast.success{border-color:var(--success)}
 .toast.error{border-color:var(--danger)}
+
+/* Deploy panel */
+.deploy-panel{margin-top:24px;padding:20px;background:var(--surface);border:1px solid var(--border);border-radius:10px}
+.deploy-panel h3{font-size:1rem;margin-bottom:10px}
+.deploy-panel p{font-size:.85rem;color:var(--muted);margin-bottom:10px}
+.deploy-panel textarea{width:100%;min-height:120px;padding:10px;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:'SF Mono',Monaco,Consolas,monospace;font-size:.8rem;resize:vertical;margin-bottom:10px}
+.deploy-link{display:block;padding:10px 16px;background:var(--accent);color:#fff;border-radius:8px;text-align:center;font-weight:600;font-size:.9rem;margin-top:8px;text-decoration:none}
+.deploy-link:hover{opacity:.85}
+.deploy-step{font-size:.8rem;color:var(--muted);margin-top:4px}
 </style>
 </head>
 <body>
@@ -137,18 +132,6 @@ h2{font-size:1.25rem;margin-bottom:12px}
   </div>
 
   <div id="setup" style="display:none">
-    <div class="auth-bar" id="auth-bar">
-      <h3>🔑 GitHub Auth</h3>
-      <div class="auth-status">
-        <span class="auth-dot" id="auth-dot"></span>
-        <span id="auth-text">Not connected</span>
-      </div>
-      <div class="field" id="auth-field" style="display:none">
-        <input id="gh-token" type="password" placeholder="Paste your GitHub PAT (repo scope)" maxlength="100">
-        <span class="auth-link">Create one at <a href="https://github.com/settings/tokens/new" target="_blank">github.com/settings/tokens</a> with <code>repo</code> scope.</span>
-      </div>
-    </div>
-
     <h1>Create Your Team</h1>
     <p class="lede">Pick your league and enter your team details. Then draft your five models.</p>
     <form id="team-form">
@@ -192,14 +175,26 @@ h2{font-size:1.25rem;margin-bottom:12px}
 
         <div class="submit-area" id="submit-area" style="display:none">
           <h2>Submit Draft</h2>
-          <p>Review your team and submit. This updates the site automatically.</p>
+          <p>Review your team and deploy it to the site:</p>
           <div class="submit-actions">
-            <button class="btn btn-success" id="submit-btn" disabled>Confirm & Update Site</button>
+            <button class="btn btn-success" id="deploy-btn" disabled>Deploy to Site</button>
           </div>
         </div>
 
-        <div class="delete-area" id="delete-area" style="display:none">
-          <button class="btn btn-danger" id="delete-team-btn">Leave League (Delete Team)</button>
+        <div class="deploy-panel" id="deploy-panel" style="display:none">
+          <h3>📡 Deploy to Site</h3>
+          <p>The workflow has been pre-filled. Click to run it:</p>
+          <a class="deploy-link" id="deploy-link" href="#" target="_blank">▶ Run Workflow →</a>
+          <p class="deploy-step">This updates data/league.json, rebuilds the site, and pushes to main.</p>
+          <p style="margin-top:12px;font-size:.8rem;color:var(--muted)">Or copy this to a manual run:</p>
+          <textarea id="deploy-data" readonly></textarea>
+          <button class="btn btn-secondary btn-sm" id="copy-deploy-btn" style="margin-top:4px">Copy to clipboard</button>
+        </div>
+
+        <div class="delete-area" id="delete-area" style="display:none;margin-top:24px;padding:16px;background:var(--surface);border:1px solid var(--border);border-radius:10px">
+          <p style="font-size:.85rem;color:var(--muted);margin-bottom:8px">Already on the site?</p>
+          <button class="btn btn-danger btn-sm" id="delete-team-btn">Leave League (Delete Team)</button>
+          <p class="deploy-step" style="margin-top:6px">This reopens your slot and removes your picks.</p>
         </div>
       </div>
 
@@ -225,35 +220,11 @@ h2{font-size:1.25rem;margin-bottom:12px}
   const TEAM_ID = 'team-1';
   const ROSTER_SIZE = 5;
   const REPO = 'ColtonKawamura/modelleague';
+  const WORKFLOW = 'update-league.yml';
 
   let leagueData = null;
   let currentLeague = null;
   let selectedModels = new Map();
-  let ghToken = sessionStorage.getItem('ml-github-token');
-
-  // ---- GitHub API ----
-  function dispatchUpdate(action, payload){
-    const url = `https://api.github.com/repos/${REPO}/dispatches`;
-    return fetch(url, {
-      method: 'POST',
-      headers: {
-        'Authorization': 'token ' + ghToken,
-        'Accept': 'application/vnd.github.v3+json',
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        event_type: 'league-update',
-        client_payload: {
-          league: currentLeague,
-          action: action,
-          ...payload
-        }
-      })
-    }).then(r => {
-      if(!r.ok) return r.json().then(d => { throw new Error(d.message || 'API error: ' + r.status); });
-      return { ok: true };
-    });
-  }
 
   // ---- Data Loading ----
   async function loadLeague(){
@@ -284,43 +255,11 @@ h2{font-size:1.25rem;margin-bottom:12px}
       document.getElementById('team-league').value = lid;
     }
     populateSlotOptions();
-    updateAuthUI();
   }
   function showDraft(){
     hideAll();
     document.getElementById('draft-view').style.display='block';
   }
-
-  // ---- Auth ----
-  function updateAuthUI(){
-    const bar = document.getElementById('auth-bar');
-    const dot = document.getElementById('auth-dot');
-    const text = document.getElementById('auth-text');
-    const field = document.getElementById('auth-field');
-    const tokenInput = document.getElementById('gh-token');
-
-    if(ghToken){
-      dot.classList.add('ok');
-      text.textContent = 'Connected';
-      field.style.display = 'none';
-      bar.classList.add('connected');
-    } else {
-      dot.classList.remove('ok');
-      text.textContent = 'Not connected';
-      field.style.display = 'block';
-      bar.classList.remove('connected');
-    }
-  }
-
-  document.getElementById('gh-token').addEventListener('change', function(){
-    const val = this.value.trim();
-    if(val){
-      ghToken = val;
-      sessionStorage.setItem('ml-github-token', val);
-      updateAuthUI();
-      showToast('Token saved (session only)','success');
-    }
-  });
 
   // ---- Team Setup ----
   function populateSlotOptions(){
@@ -480,13 +419,22 @@ h2{font-size:1.25rem;margin-bottom:12px}
   }
   function isModelOwnedByMe(mid){ return selectedModels.has(mid); }
 
-  // ---- Submit ----
-  document.getElementById('submit-btn').addEventListener('click',function(){
-    if(selectedModels.size < ROSTER_SIZE) return;
-    if(!ghToken){ showToast('Enter your GitHub PAT first.','error'); return; }
+  // ---- Deploy ----
+  function showDeployPanel(inputs, teamName){
+    const wfUrl = `https://github.com/${REPO}/actions/workflows/${WORKFLOW}`;
+    const panel = document.getElementById('deploy-panel');
+    panel.style.display = 'block';
+    document.getElementById('deploy-link').href = wfUrl;
+    document.getElementById('deploy-link').title = teamName || 'Deploy';
+    document.getElementById('deploy-data').value = JSON.stringify(inputs, null, 2);
+  }
 
-    const btn = document.getElementById('submit-btn');
-    btn.textContent = 'Updating…'; btn.disabled = true;
+  document.getElementById('deploy-btn').addEventListener('click',function(){
+    if(selectedModels.size < ROSTER_SIZE) return;
+
+    const lg = leagueData.leagues[currentLeague];
+    const team = lg.teams.find(t=>t.id===TEAM_ID);
+    if(!team) return;
 
     const draftedList = [];
     selectedModels.forEach((pickIdx, modelId)=>{
@@ -494,38 +442,45 @@ h2{font-size:1.25rem;margin-bottom:12px}
     });
     draftedList.sort((a,b)=>a.pick-b.pick);
     const modelIds = draftedList.map(d=>d.modelId);
-    const slot = leagueData.leagues[currentLeague].teams.find(t=>t.id===TEAM_ID).slot;
 
-    dispatchUpdate('join', {
-      team_name: leagueData.leagues[currentLeague].teams.find(t=>t.id===TEAM_ID).teamName,
-      owner_name: leagueData.leagues[currentLeague].teams.find(t=>t.id===TEAM_ID).owner,
-      slot: slot,
+    const inputs = {
+      league: currentLeague,
+      action: 'join',
+      team_name: team.teamName,
+      owner_name: team.owner,
+      slot: team.slot,
       model_ids: modelIds.join(',')
-    }).then(()=>{
-      showToast('Site updated! Refreshing…','success');
-      setTimeout(()=>{ location.reload(); }, 2000);
-    }).catch(e=>{
-      showToast('Update failed: '+e.message,'error');
-      btn.textContent = 'Confirm & Update Site'; btn.disabled = false;
-    });
+    };
+
+    showDeployPanel(inputs, team.teamName);
+    showToast('Ready to deploy!','success');
   });
 
-  // ---- Delete / Leave team ----
+  document.getElementById('copy-deploy-btn').addEventListener('click',function(){
+    const box = document.getElementById('deploy-data');
+    box.select();
+    navigator.clipboard.writeText(box.value).then(()=>showToast('Copied!','success'));
+  });
+
+  // ---- Leave League ----
   document.getElementById('delete-team-btn').addEventListener('click',function(){
     if(!confirm('Remove your team from the league? This cannot be undone.')) return;
-    if(!ghToken){ showToast('Enter your GitHub PAT first.','error'); return; }
 
-    const btn = document.getElementById('delete-team-btn');
-    btn.textContent = 'Removing…'; btn.disabled = true;
-    const teamName = leagueData.leagues[currentLeague].teams.find(t=>t.id===TEAM_ID).teamName;
+    const lg = leagueData.leagues[currentLeague];
+    const team = lg.teams.find(t=>t.id===TEAM_ID);
+    if(!team) return;
 
-    dispatchUpdate('leave', { team_name: teamName }).then(()=>{
-      showToast('Team removed!','success');
-      setTimeout(()=>{ location.reload(); }, 1500);
-    }).catch(e=>{
-      showToast('Remove failed: '+e.message,'error');
-      btn.textContent = 'Leave League (Delete Team)'; btn.disabled = false;
-    });
+    const inputs = {
+      league: currentLeague,
+      action: 'leave',
+      team_name: team.teamName,
+      owner_name: '',
+      slot: '',
+      model_ids: ''
+    };
+
+    showDeployPanel(inputs, team.teamName + ' (leave)');
+    showToast('Run the workflow to leave.','success');
   });
 
   // ---- Reset ----
