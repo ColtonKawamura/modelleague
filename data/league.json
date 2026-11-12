@@ -14,7 +14,7 @@
     "roster_size": 5,
     "starters": 4,
     "gate_enabled": true,
-    "gate_sha256": "25c6377e426f16e47936ab0193fdd98acf137ba2a4491aee08e0d8dc774d55a6",
+    "gate_sha256": "894eebb42e612008125418ab350e83fad6d716a02d280efa045d1b555f58200d",
     "repo": "https://github.com/ColtonKawamura/modelleague",
     "contact": "open an issue on the repo with your team name, or message Colton directly"
   },
