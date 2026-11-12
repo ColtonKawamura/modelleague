@@ -407,8 +407,8 @@ h2{font-size:1.25rem;margin-bottom:12px}
   function updateSubmitState(team){
     const count = selectedModels.size;
     document.getElementById('roster-count').textContent = count;
-    const sb = document.getElementById('submit-btn');
-    sb.disabled = count < ROSTER_SIZE;
+    const sb = document.getElementById('deploy-btn');
+    if (sb) sb.disabled = count < ROSTER_SIZE;
     document.getElementById('submit-area').style.display = count >= ROSTER_SIZE ? 'block' : 'none';
     // Show delete if team has data in the live data
     const lg = leagueData.leagues[currentLeague];
