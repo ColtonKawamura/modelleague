@@ -514,7 +514,11 @@ def league_page(data, lid, gate_json):
     standings.</li>
   </ol>
 </section>
-""" % (banner(data), esc(lg["name"]), esc(lg["slugline"]), team_rows, esc(lg["pool_status"]), pool_rows, standings)
+
+<section>
+  <a class="draft-btn" href="%sdraft.html?league=%s">Draft a Team &rarr;</a>
+</section>
+""" % (banner(data), esc(lg["name"]), esc(lg["slugline"]), team_rows, esc(lg["pool_status"]), pool_rows, standings, prefix, lid)
     return doc(prefix, "%s — ModelLeague" % lg["name"], body, league_class=cls, gate_json=gate_json)
 
 
@@ -544,6 +548,12 @@ def build(out_dir):
 
     shutil.copyfile(ASSETS_DIR / "style.css", out_dir / "assets" / "style.css")
     shutil.copyfile(ASSETS_DIR / "gate.js", out_dir / "assets" / "gate.js")
+
+    # Copy draft page if it exists
+    draft_src = ROOT / "site" / "draft.html"
+    draft_dst = out_dir / "draft.html"
+    if draft_src.exists():
+        draft_dst.write_text(draft_src.read_text(encoding="utf-8"), encoding="utf-8")
 
     for rel in PAGES:
         if not (out_dir / rel).exists():

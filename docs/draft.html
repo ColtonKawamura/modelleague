@@ -105,7 +105,6 @@ textarea.export-box{width:100%;min-height:200px;padding:12px;background:var(--bg
 .toast.success{border-color:var(--success)}
 .toast.error{border-color:var(--danger)}
 </style>
-</script>
 </head>
 <body>
 <header>
@@ -238,6 +237,12 @@ textarea.export-box{width:100%;min-height:200px;padding:12px;background:var(--bg
   function showSetup(){
     hideAll();
     document.getElementById('setup').style.display='block';
+    // Pre-select league from URL parameter (e.g. ?league=frontier)
+    const params = new URLSearchParams(window.location.search);
+    const lid = params.get('league');
+    if(lid && leagueData.leagues[lid]){
+      document.getElementById('team-league').value = lid;
+    }
     populateSlotOptions();
   }
   function showDraft(){

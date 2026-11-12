@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Draft a Team — ModelLeague</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0a0a0f;--surface:#12121a;--surface-hover:#1a1a24;--border:#2a2a3a;--border-accent:#4444aa;
+--text:#e8e8f0;--muted:#888899;--accent:#6666dd;--accent-hover:#8888ff;--success:#44bb66;--danger:#dd4444;
+--green:#22aa44;--yellow:#bb9922;--gold:#ddbb33}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,sans-serif;line-height:1.6}
+a{color:var(--accent);text-decoration:none}a:hover{color:var(--accent-hover)}
+.wrap{max-width:1000px;margin:0 auto;padding:0 20px}
+header{border-bottom:1px solid var(--border);background:var(--surface);position:sticky;top:0;z-index:100}
+.header-inner{display:flex;align-items:center;justify-content:space-between;height:56px}
+.brand{font-size:1.1rem;font-weight:700;letter-spacing:.02em}
+nav{display:flex;gap:20px;font-size:.875rem}
+nav a{color:var(--muted);transition:color .15s}
+nav a:hover{color:var(--text)}
+nav .active{color:var(--accent)}
+main{padding:40px 0 80px}
+section{margin-bottom:32px}
+h1{font-size:1.75rem;margin-bottom:8px}
+h2{font-size:1.25rem;margin-bottom:12px}
+h3{font-size:1rem;margin-bottom:8px}
+.lede{color:var(--muted);margin-bottom:24px}
+
+/* Loading */
+#loading{text-align:center;padding:80px 0}
+.spinner{width:40px;height:40px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 16px}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* Setup form */
+#setup{max-width:480px}
+.field{margin-bottom:20px}
+.field label{display:block;font-size:.8rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin-bottom:6px}
+.field input,.field select{width:100%;padding:10px 14px;background:var(--surface);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:1rem}
+.field input:focus,.field select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 2px rgba(102,102,221,.2)}
+.field select option{background:var(--surface);color:var(--text)}
+.btn{display:inline-flex;align-items:center;justify-content:center;padding:12px 28px;border:none;border-radius:8px;font-size:.95rem;font-weight:600;cursor:pointer;transition:all .15s}
+.btn-primary{background:var(--accent);color:#fff}.btn-primary:hover{background:var(--accent-hover)}
+.btn-primary:disabled{opacity:.5;cursor:not-allowed}
+.btn-secondary{background:var(--surface);color:var(--muted);border:1px solid var(--border)}.btn-secondary:hover{color:var(--text);border-color:var(--muted)}
+.btn-success{background:var(--success);color:#fff}.btn-success:hover{opacity:.85}
+.btn-sm{padding:8px 16px;font-size:.85rem}
+
+/* Draft layout */
+.draft-layout{display:grid;grid-template-columns:1fr 340px;gap:24px;align-items:start}
+@media(max-width:800px){.draft-layout{grid-template-columns:1fr}}
+
+/* Pick queue */
+.pick-queue{display:flex;gap:6px;margin-bottom:20px;flex-wrap:wrap}
+.pick-dot{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:700;border:2px solid var(--border);color:var(--muted);transition:all .15s}
+.pick-dot.future{opacity:.5}
+.pick-dot.current{border-color:var(--accent);color:var(--accent);transform:scale(1.15);box-shadow:0 0 12px rgba(102,102,221,.4)}
+.pick-dot.done{border-color:var(--success);color:var(--success)}
+.pick-dot.mine{background:rgba(102,102,221,.15);border-color:var(--accent)}
+
+/* Roster panel */
+.roster-panel{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;position:sticky;top:76px}
+.roster-title{font-size:.85rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin-bottom:12px}
+.roster-slots{margin-bottom:16px}
+.roster-slot{padding:10px 12px;border:1px solid var(--border);border-radius:8px;margin-bottom:8px;font-size:.9rem;transition:all .15s}
+.roster-slot.empty{border-style:dashed;color:var(--muted);font-style:italic}
+.roster-slot.filled{border-color:var(--accent);background:rgba(102,102,221,.06)}
+.roster-slot .model-name{font-weight:600}
+.roster-slot .lab{color:var(--muted);font-size:.8rem}
+.roster-slot .pick-label{color:var(--accent);font-size:.75rem;font-weight:600;margin-top:2px}
+
+.roster-summary{border-top:1px solid var(--border);padding-top:12px;display:flex;justify-content:space-between;align-items:center}
+.roster-count{font-size:.85rem;color:var(--muted)}
+.roster-count strong{color:var(--text)}
+
+/* Model grid */
+.model-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
+.model-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px;cursor:pointer;transition:all .15s;position:relative}
+.model-card:hover:not(.unavailable){border-color:var(--accent);background:var(--surface-hover);transform:translateY(-1px)}
+.model-card.selected{border-color:var(--accent);background:rgba(102,102,221,.1);box-shadow:0 0 16px rgba(102,102,221,.15)}
+.model-card.selected::after{content:'✓';position:absolute;top:8px;right:10px;color:var(--accent);font-weight:700}
+.model-card.unavailable{opacity:.35;cursor:not-allowed;filter:grayscale(.5)}
+.model-card .model-name{font-weight:700;font-size:1rem;margin-bottom:2px}
+.model-card .lab{color:var(--muted);font-size:.85rem}
+.model-card .owner-tag{margin-top:8px;font-size:.75rem;padding:2px 8px;border-radius:4px;display:inline-block}
+.model-card .owner-tag.yours{background:rgba(102,102,221,.15);color:var(--accent)}
+.model-card .owner-tag.others{background:rgba(102,102,221,.06);color:var(--muted)}
+.model-card .pick-badge{margin-top:6px;font-size:.75rem;color:var(--muted)}
+
+/* Submit */
+.submit-area{margin-top:24px;text-align:center}
+.submit-area p{color:var(--muted);font-size:.85rem;margin-bottom:12px}
+
+/* Export */
+.export-area{margin-top:16px}
+textarea.export-box{width:100%;min-height:200px;padding:12px;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:'SF Mono',Monaco,Consolas,monospace;font-size:.8rem;resize:vertical}
+
+/* Status bar */
+.status-bar{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;background:var(--surface);border:1px solid var(--border);border-radius:8px;margin-bottom:20px;font-size:.85rem}
+.status-bar .league-name{font-weight:700}
+.status-bar .draft-info{color:var(--muted)}
+
+/* Toast */
+.toast{position:fixed;bottom:24px;right:24px;padding:14px 20px;background:var(--surface);border:1px solid var(--border);border-radius:10px;font-size:.9rem;z-index:1000;transform:translateY(120%);transition:transform .3s ease}
+.toast.show{transform:translateY(0)}
+.toast.success{border-color:var(--success)}
+.toast.error{border-color:var(--danger)}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap header-inner">
+    <a class="brand" href="index.html">ModelLeague</a>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="frontier/index.html">Frontier</a>
+      <a href="open/index.html">Open Source</a>
+      <a href="rules.html">Rules</a>
+      <a href="methodology.html">The Index</a>
+      <a href="draft.html" class="active">Draft</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <!-- Loading state -->
+  <div id="loading">
+    <div class="spinner"></div>
+    <p>Loading league data…</p>
+  </div>
+
+  <!-- Setup form -->
+  <div id="setup" style="display:none">
+    <h1>Create Your Team</h1>
+    <p class="lede">Pick your league and enter your team details. Then draft your five models.</p>
+    <form id="team-form">
+      <div class="field">
+        <label for="team-league">League</label>
+        <select id="team-league" required>
+          <option value="">— choose league —</option>
+          <option value="frontier">Frontier League (closed lab models)</option>
+          <option value="open">Open Source League (open-weight models)</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="team-name">Team Name *</label>
+        <input id="team-name" type="text" placeholder="e.g. DeepSeek Dynasty" maxlength="40" required>
+      </div>
+      <div class="field">
+        <label for="team-owner">Owner Name *</label>
+        <input id="team-owner" type="text" placeholder="e.g. Colton" maxlength="40" required>
+      </div>
+      <div class="field">
+        <label for="team-slot">Preferred Slot (optional)</label>
+        <select id="team-slot">
+          <option value="">Auto-assign</option>
+        </select>
+      </div>
+      <button type="submit" class="btn btn-primary" style="width:100%">Start Draft →</button>
+    </form>
+  </div>
+
+  <!-- Draft view -->
+  <div id="draft-view" style="display:none">
+    <div class="status-bar">
+      <span class="league-name" id="status-league"></span>
+      <span class="draft-info" id="status-team"></span>
+    </div>
+
+    <div class="draft-layout">
+      <div>
+        <h2>Pick Queue</h2>
+        <div class="pick-queue" id="pick-queue"></div>
+
+        <h2>Available Models</h2>
+        <p class="lede">Click a model to add it to your roster. You can swap picks before submitting.</p>
+        <div class="model-grid" id="model-grid"></div>
+      </div>
+
+      <div class="roster-panel">
+        <div class="roster-title">Your Roster</div>
+        <div class="roster-slots" id="roster-slots"></div>
+        <div class="roster-summary">
+          <span class="roster-count"><strong id="roster-count">0</strong> / 5 drafted</span>
+          <button class="btn btn-success btn-sm" id="submit-btn" disabled>Submit Draft</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="submit-area" id="submit-area" style="display:none">
+      <h2>Submit Draft</h2>
+      <p>Review your team and submit. This will update the league data.</p>
+      <div style="display:flex;gap:12px;justify-content:center">
+        <button class="btn btn-primary" id="confirm-btn">Confirm & Update</button>
+        <button class="btn btn-secondary" id="export-btn">Export JSON</button>
+      </div>
+      <div class="export-area" id="export-area" style="display:none">
+        <textarea class="export-box" id="export-box" readonly></textarea>
+        <button class="btn btn-secondary btn-sm" id="copy-btn" style="margin-top:8px">Copy to clipboard</button>
+        <p style="font-size:.8rem;color:var(--muted);margin-top:8px">Copy this and paste into <code>data/league.json</code>, then push to deploy.</p>
+      </div>
+    </div>
+  </div>
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+  'use strict';
+
+  const TEAM_ID = 'team-1';
+  const ROSTER_SIZE = 5;
+
+  let leagueData = null;
+  let currentLeague = null;
+  let selectedModels = new Map(); // modelId -> pickIndex (1-based)
+
+  // ---- Data Loading ----
+  async function loadLeague(){
+    try{
+      const r = await fetch('../data/league.json');
+      if(!r.ok) throw new Error('HTTP '+r.status);
+      leagueData = await r.json();
+      showSetup();
+    }catch(e){
+      document.getElementById('loading').innerHTML =
+        '<p style="color:var(--danger)">Failed to load league data. Make sure league.json is served at <code>data/league.json</code>.</p>';
+    }
+  }
+
+  // ---- View Management ----
+  function hideAll(){
+    document.getElementById('loading').style.display='none';
+    document.getElementById('setup').style.display='none';
+    document.getElementById('draft-view').style.display='none';
+  }
+  function showSetup(){
+    hideAll();
+    document.getElementById('setup').style.display='block';
+    // Pre-select league from URL parameter (e.g. ?league=frontier)
+    const params = new URLSearchParams(window.location.search);
+    const lid = params.get('league');
+    if(lid && leagueData.leagues[lid]){
+      document.getElementById('team-league').value = lid;
+    }
+    populateSlotOptions();
+  }
+  function showDraft(){
+    hideAll();
+    document.getElementById('draft-view').style.display='block';
+  }
+
+  // ---- Team Setup ----
+  function populateSlotOptions(){
+    const sel = document.getElementById('team-slot');
+    const lid = document.getElementById('team-league').value;
+    if(!lid) return;
+    const lg = leagueData.leagues[lid];
+    sel.innerHTML = '<option value="">Auto-assign</option>';
+    lg.teams.forEach(t=>{
+      if(t.status==='open'){
+        const opt = document.createElement('option');
+        opt.value = t.slot;
+        opt.textContent = 'Slot ' + t.slot;
+        sel.appendChild(opt);
+      }
+    });
+  }
+
+  document.getElementById('team-league').addEventListener('change', populateSlotOptions);
+
+  document.getElementById('team-form').addEventListener('submit', function(e){
+    e.preventDefault();
+    const lid = document.getElementById('team-league').value;
+    const teamName = document.getElementById('team-name').value.trim();
+    const ownerName = document.getElementById('team-owner').value.trim();
+    let slot = document.getElementById('team-slot').value;
+
+    if(!lid || !teamName || !ownerName) return;
+    currentLeague = lid;
+    selectedModels.clear();
+
+    if(slot){
+      slot = parseInt(slot);
+      const lg = leagueData.leagues[lid];
+      lg.teams.forEach(t=>{
+        if(t.slot===slot){
+          t.name = teamName;
+          t.owner = ownerName;
+          t.status = 'claimed';
+        }
+      });
+    } else {
+      const lg = leagueData.leagues[lid];
+      const openSlots = lg.teams.filter(t=>t.status==='open');
+      if(!openSlots.length){
+        showToast('No open slots in this league.','error');
+        return;
+      }
+      slot = openSlots[0].slot;
+      openSlots[0].name = teamName;
+      openSlots[0].owner = ownerName;
+      openSlots[0].status = 'claimed';
+    }
+
+    const team = leagueData.leagues[lid].teams.find(t=>t.slot===slot);
+    team.id = TEAM_ID;
+    team.league = lid;
+    team.teamName = teamName;
+    team.pickOrder = slot;
+    team.draftComplete = false;
+    team.draftedModels = [];
+
+    buildDraftUI();
+    showDraft();
+    showToast('Draft started!','success');
+  });
+
+  // ---- Draft UI ----
+  function buildDraftUI(){
+    const lg = leagueData.leagues[currentLeague];
+    const team = lg.teams.find(t=>t.id===TEAM_ID);
+    if(!team) return;
+
+    document.getElementById('status-league').textContent = lg.name;
+    document.getElementById('status-team').textContent = team.teamName + ' — Slot ' + team.pickOrder;
+
+    renderPickQueue(team);
+    renderModelGrid(lg);
+    renderRoster(team);
+    updateSubmitState(team);
+  }
+
+  function getDraftOrder(lg){
+    const slots = lg.teams.map(t=>t.slot).filter(s=>s!==null&&s!==undefined).sort((a,b)=>a-b);
+    const order = [];
+    for(let round=0;round<ROSTER_SIZE;round++){
+      const roundSlots = round%2===0 ? [...slots] : [...slots].reverse();
+      roundSlots.forEach(s=>order.push(s));
+    }
+    return order;
+  }
+
+  function getTeamPickOrder(team){
+    const order = getDraftOrder(leagueData.leagues[currentLeague]);
+    return order.filter(s=>s===team.pickOrder).map((_,i)=>i+1);
+  }
+
+  function renderPickQueue(team){
+    const container = document.getElementById('pick-queue');
+    const picks = getTeamPickOrder(team);
+    container.innerHTML = '';
+    picks.forEach((pickNum,i)=>{
+      const dot = document.createElement('div');
+      dot.className = 'pick-dot';
+      dot.textContent = pickNum;
+      if(selectedModels.has(pickNum)){
+        dot.classList.add('done','mine');
+        dot.title = 'Pick '+pickNum+' → '+selectedModels.get(pickNum);
+      } else {
+        dot.classList.add('future');
+        dot.title = 'Pick '+pickNum+' — untaken';
+      }
+      container.appendChild(dot);
+    });
+  }
+
+  function renderModelGrid(lg){
+    const container = document.getElementById('model-grid');
+    const team = lg.teams.find(t=>t.id===TEAM_ID);
+    container.innerHTML = '';
+
+    lg.pool.forEach(m=>{
+      const card = document.createElement('div');
+      const isOwned = isModelOwned(m.id);
+      const isMine = isModelOwnedByMe(m.id);
+      const myPick = selectedModels.get(m.id);
+
+      card.className = 'model-card';
+      if(isOwned && !isMine) card.classList.add('unavailable');
+      if(isMine) card.classList.add('selected');
+
+      let ownerHtml = '';
+      if(isMine) ownerHtml = '<span class="owner-tag yours">Your pick</span>';
+      else if(isOwned){
+        const ownerTeam = lg.teams.find(t=>(t.draftedModels||[]).includes(m.id));
+        const ownerName = ownerTeam ? ownerTeam.teamName || ownerTeam.name : 'Unknown';
+        ownerHtml = '<span class="owner-tag others">'+esc(ownerName)+'</span>';
+      }
+
+      card.innerHTML =
+        '<div class="model-name">'+esc(m.name)+'</div>'+
+        '<div class="lab">'+esc(m.lab)+'</div>'+
+        ownerHtml+
+        (myPick ? '<div class="pick-badge">Pick '+myPick+'</div>' : '');
+
+      if(!isOwned || isMine){
+        card.addEventListener('click',()=>handlePick(m.id));
+      }
+
+      container.appendChild(card);
+    });
+  }
+
+  function renderRoster(team){
+    const container = document.getElementById('roster-slots');
+    const picks = getTeamPickOrder(team);
+    container.innerHTML = '';
+
+    picks.forEach(pickNum=>{
+      const slot = document.createElement('div');
+      const modelId = [...selectedModels.entries()].find(([,p])=>p===pickNum)?.[0];
+      const lg = leagueData.leagues[currentLeague];
+      const model = modelId ? lg.pool.find(m=>m.id===modelId) : null;
+
+      slot.className = 'roster-slot '+(model?'filled':'empty');
+
+      if(model){
+        slot.innerHTML =
+          '<div class="model-name">'+esc(model.name)+'</div>'+
+          '<div class="lab">'+esc(model.lab)+'</div>'+
+          '<div class="pick-label">Pick '+pickNum+'</div>';
+      } else {
+        slot.textContent = 'Pick '+pickNum+' — open';
+      }
+
+      container.appendChild(slot);
+    });
+  }
+
+  function updateSubmitState(team){
+    const btn = document.getElementById('submit-btn');
+    const count = selectedModels.size;
+    document.getElementById('roster-count').textContent = count;
+    btn.disabled = count < ROSTER_SIZE;
+
+    const submitArea = document.getElementById('submit-area');
+    submitArea.style.display = count >= ROSTER_SIZE ? 'block' : 'none';
+  }
+
+  function handlePick(modelId){
+    const lg = leagueData.leagues[currentLeague];
+    const team = lg.teams.find(t=>t.id===TEAM_ID);
+    if(!team) return;
+
+    // If model is already selected, deselect it
+    if(selectedModels.has(modelId)){
+      selectedModels.delete(modelId);
+      showToast('Pick removed.','success');
+    } else {
+      // Check if this slot (pick) is already taken by another model
+      const picks = getTeamPickOrder(team);
+      const filledPicks = new Set([...selectedModels.values()]);
+      const openPick = picks.find(p=>!filledPicks.has(p));
+
+      if(openPick){
+        selectedModels.set(modelId, openPick);
+        showToast('Picked!','success');
+      } else {
+        showToast('Roster full — swap by clicking a picked model to remove.','error');
+      }
+    }
+
+    buildDraftUI();
+  }
+
+  function isModelOwned(modelId){
+    const lg = leagueData.leagues[currentLeague];
+    return lg.teams.some(t=>(t.draftedModels||[]).includes(modelId)||t.id===TEAM_ID&&selectedModels.has(modelId));
+  }
+  function isModelOwnedByMe(modelId){
+    return selectedModels.has(modelId);
+  }
+
+  // ---- Submit / Export ----
+  document.getElementById('submit-btn').addEventListener('click',function(){
+    if(selectedModels.size < ROSTER_SIZE) return;
+    const team = leagueData.leagues[currentLeague].teams.find(t=>t.id===TEAM_ID);
+    if(!team) return;
+
+    const draftedList = [];
+    selectedModels.forEach((pickIdx, modelId)=>{
+      draftedList.push({
+        modelId: modelId,
+        pick: pickIdx,
+        name: getModelName(modelId),
+        pickLabel: 'Pick '+pickIdx
+      });
+    });
+    draftedList.sort((a,b)=>a.pick-b.pick);
+
+    team.draftedModels = draftedList.map(d=>d.modelId);
+    team.draftComplete = true;
+    team.modelRoster = draftedList;
+
+    renderPickQueue(team);
+    renderModelGrid(leagueData.leagues[currentLeague]);
+    renderRoster(team);
+    updateSubmitState(team);
+
+    showToast('Draft complete! Your roster is ready.','success');
+  });
+
+  document.getElementById('export-btn').addEventListener('click',function(){
+    const team = leagueData.leagues[currentLeague].teams.find(t=>t.id===TEAM_ID);
+    if(!team) return;
+
+    const exportData = JSON.stringify(leagueData,null,2);
+    document.getElementById('export-box').value = exportData;
+    document.getElementById('export-area').style.display = 'block';
+  });
+
+  document.getElementById('copy-btn').addEventListener('click',function(){
+    const box = document.getElementById('export-box');
+    box.select();
+    navigator.clipboard.writeText(box.value).then(()=>{
+      showToast('JSON copied!','success');
+    }).catch(()=>{
+      showToast('Failed to copy — select and copy manually.','error');
+    });
+  });
+
+  document.getElementById('confirm-btn').addEventListener('click',function(){
+    showToast('Team submitted! Copy the JSON and push to GitHub to deploy.','success');
+  });
+
+  // ---- Helpers ----
+  function getModelName(modelId){
+    const lg = leagueData.leagues[currentLeague];
+    const m = lg.pool.find(m=>m.id===modelId);
+    return m ? m.name : modelId;
+  }
+  function esc(s){
+    const d = document.createElement('div');
+    d.textContent = s;
+    return d.innerHTML;
+  }
+  function showToast(msg, type){
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = 'toast show '+(type||'');
+    clearTimeout(t._timer);
+    t._timer = setTimeout(()=>t.className='toast', 3000);
+  }
+
+  // ---- Init ----
+  loadLeague();
+})();
+</script>
+</body>
+</html>
