@@ -26,9 +26,9 @@
       "teams": [
         {
           "slot": 1,
-          "name": null,
-          "owner": null,
-          "status": "open"
+          "name": "",
+          "owner": "",
+          "status": "claimed"
         },
         {
           "slot": 2,
