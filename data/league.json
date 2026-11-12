@@ -26,9 +26,49 @@
       "teams": [
         {
           "slot": 1,
-          "name": null,
-          "owner": null,
-          "status": "open"
+          "name": "Alpha Squad",
+          "owner": "Colton",
+          "status": "claimed",
+          "draftedModels": [
+            "gpt-6-astra",
+            "claude-opus-5-5",
+            "claude-sonnet-5-5",
+            "claude-fable-5-1",
+            "gemini-4-carbon"
+          ],
+          "draftComplete": true,
+          "modelRoster": [
+            {
+              "modelId": "gpt-6-astra",
+              "pick": 1,
+              "name": "gpt-6-astra",
+              "pickLabel": "Pick 1"
+            },
+            {
+              "modelId": "claude-opus-5-5",
+              "pick": 2,
+              "name": "claude-opus-5-5",
+              "pickLabel": "Pick 2"
+            },
+            {
+              "modelId": "claude-sonnet-5-5",
+              "pick": 3,
+              "name": "claude-sonnet-5-5",
+              "pickLabel": "Pick 3"
+            },
+            {
+              "modelId": "claude-fable-5-1",
+              "pick": 4,
+              "name": "claude-fable-5-1",
+              "pickLabel": "Pick 4"
+            },
+            {
+              "modelId": "gemini-4-carbon",
+              "pick": 5,
+              "name": "gemini-4-carbon",
+              "pickLabel": "Pick 5"
+            }
+          ]
         },
         {
           "slot": 2,
