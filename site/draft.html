@@ -222,9 +222,9 @@ h2{font-size:1.25rem;margin-bottom:12px}
   const REPO = 'ColtonKawamura/modelleague';
   const WORKFLOW = 'update-league.yml';
 
-  let leagueData = null;
-  let currentLeague = null;
-  let selectedModels = new Map();
+  window.leagueData = null;
+  window.currentLeague = null;
+  window.selectedModels = new Map();
 
   // ---- Data Loading ----
   async function loadLeague(){
@@ -435,10 +435,10 @@ h2{font-size:1.25rem;margin-bottom:12px}
   }
 
   function isModelOwned(mid){
-    const lg = leagueData.leagues[currentLeague];
-    return lg.teams.some(t=> (t.draftedModels||[]).includes(mid)||(t.id===TEAM_ID&&selectedModels.has(mid)));
+    const lg = window.leagueData.leagues[window.currentLeague];
+    return lg.teams.some(t=> (t.draftedModels||[]).includes(mid)||(t.id===TEAM_ID&&window.selectedModels.has(mid)));
   }
-  function isModelOwnedByMe(mid){ return selectedModels.has(mid); }
+  function isModelOwnedByMe(mid){ return window.selectedModels.has(mid); }
 
   // ---- Deploy ----
   function showDeployPanel(inputs, teamName){
@@ -515,7 +515,7 @@ h2{font-size:1.25rem;margin-bottom:12px}
   });
 
   // ---- Helpers ----
-  function getModelName(mid){ const m = leagueData.leagues[currentLeague].pool.find(m=>m.id===mid); return m?m.name:mid; }
+  function getModelName(mid){ const m = window.leagueData.leagues[window.currentLeague].pool.find(m=>m.id===mid); return m?m.name:mid; }
   function esc(s){ const d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
   function showToast(msg,type){
     const t=document.getElementById('toast');
