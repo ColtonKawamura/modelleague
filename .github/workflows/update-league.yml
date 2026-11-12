@@ -1,0 +1,157 @@
+name: Update league data
+
+on:
+  repository_dispatch:
+    types: [league-update]
+  workflow_dispatch:
+    inputs:
+      league:
+        description: "League id (frontier or open)"
+        required: true
+        default: "frontier"
+      action:
+        description: "Action (join or leave)"
+        required: true
+        default: "join"
+      team_name:
+        description: "Team name (for join)"
+        required: false
+        default: ""
+      owner_name:
+        description: "Owner name (for join)"
+        required: false
+        default: ""
+      slot:
+        description: "Slot number (for join)"
+        required: false
+        default: ""
+      model_ids:
+        description: "Comma-separated model IDs (for join)"
+        required: false
+        default: ""
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GH_PAT }}
+
+      - name: Update league data
+        id: update
+        env:
+          LEAGUE: ${{ github.event.client_payload.league || github.event.inputs.league }}
+          ACTION: ${{ github.event.client_payload.action || github.event.inputs.action }}
+          TEAM_NAME: ${{ github.event.client_payload.team_name || github.event.inputs.team_name }}
+          OWNER_NAME: ${{ github.event.client_payload.owner_name || github.event.inputs.owner_name }}
+          SLOT: ${{ github.event.client_payload.slot || github.event.inputs.slot }}
+          MODEL_IDS: ${{ github.event.client_payload.model_ids || github.event.inputs.model_ids }}
+        run: |
+          python3 - <<'PYEOF'
+          import json, pathlib, os, sys
+
+          repo = pathlib.Path(".")
+          data_file = repo / "data" / "league.json"
+          with open(data_file, "r") as f:
+              data = json.load(f)
+
+          league = os.environ.get("LEAGUE", "frontier")
+          action = os.environ.get("ACTION", "join")
+          team_name = os.environ.get("TEAM_NAME", "").strip()
+          owner_name = os.environ.get("OWNER_NAME", "").strip()
+          slot_str = os.environ.get("SLOT", "").strip()
+          model_ids_str = os.environ.get("MODEL_IDS", "").strip()
+
+          slot = None
+          if slot_str:
+              try:
+                  slot = int(slot_str)
+              except ValueError:
+                  slot = None
+
+          if league not in data["leagues"]:
+              print(f"ERROR: league '{league}' not found")
+              sys.exit(1)
+
+          lg = data["leagues"][league]
+
+          if action == "join":
+              # Find or create a team slot
+              if slot:
+                  for t in lg["teams"]:
+                      if t["slot"] == slot:
+                          t["name"] = team_name
+                          t["owner"] = owner_name
+                          t["status"] = "claimed"
+                          break
+              else:
+                  for t in lg["teams"]:
+                      if t["status"] == "open":
+                          t["name"] = team_name
+                          t["owner"] = owner_name
+                          t["status"] = "claimed"
+                          slot = t["slot"]
+                          break
+
+              if slot is None:
+                  print("ERROR: no open slots in this league")
+                  sys.exit(1)
+
+              # Set drafted models if provided
+              if model_ids_str:
+                  model_ids = [m.strip() for m in model_ids_str.split(",") if m.strip()]
+                  drafted_list = []
+                  for i, mid in enumerate(model_ids):
+                      drafted_list.append({
+                          "modelId": mid,
+                          "pick": i + 1,
+                          "name": mid,
+                          "pickLabel": f"Pick {i + 1}"
+                      })
+                  lg["teams"][slot - 1]["draftedModels"] = model_ids
+                  lg["teams"][slot - 1]["draftComplete"] = True
+                  lg["teams"][slot - 1]["modelRoster"] = drafted_list
+
+          elif action == "leave":
+              # Find team by name and unclaim it
+              found = False
+              for t in lg["teams"]:
+                  if t["name"] == team_name and t["status"] == "claimed":
+                      t["name"] = None
+                      t["owner"] = None
+                      t["status"] = "open"
+                      t["draftedModels"] = []
+                      t["draftComplete"] = False
+                      found = True
+                      print(f"Removed team '{team_name}' from slot {t['slot']}")
+                      break
+              if not found:
+                  print(f"ERROR: team '{team_name}' not found")
+                  sys.exit(1)
+
+          # Save
+          with open(data_file, "w") as f:
+              json.dump(data, f, indent=2)
+              f.write("\n")
+
+          print(f"Updated {league}, action={action}")
+          PYEOF
+
+      - name: Run site build
+        run: python3 site/build.py
+
+      - name: Commit and push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "Update league data: ${{ github.event.client_payload.action || 'manual dispatch' }}"
+            git push
+          fi
