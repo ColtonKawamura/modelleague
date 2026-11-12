@@ -319,7 +319,7 @@ h2{font-size:1.25rem;margin-bottom:12px}
       showToast('Could not find team slot.','error');
       return;
     }
-    team.id=TEAM_ID; team.league=lid; team.teamName=teamName;
+    team.id=TEAM_ID; team.league=lid; team.teamName=teamName; team.owner=ownerName;
     team.pickOrder=slot; team.draftComplete=false; team.draftedModels=[];
 
     console.log('DEBUG: team created:', JSON.stringify(team));
