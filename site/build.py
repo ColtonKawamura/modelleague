@@ -55,6 +55,7 @@ def doc(prefix, title, body, league_class="", gate_json="{}"):
         ("Home", "%s" % prefix),
         ("Frontier", "%sfrontier/" % prefix),
         ("Open Source", "%sopen/" % prefix),
+        ("Draft", "%sdraft.html" % prefix),
         ("Rules", "%srules.html" % prefix),
         ("The Index", "%smethodology.html" % prefix),
     ]
