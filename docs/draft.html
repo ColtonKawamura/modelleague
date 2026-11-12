@@ -294,9 +294,12 @@ h2{font-size:1.25rem;margin-bottom:12px}
     currentLeague = lid;
     selectedModels.clear();
 
+    const lg = leagueData.leagues[lid];
+    const allStatuses = lg.teams.map(t=>({slot:t.slot, status:t.status, name:t.name}));
+    console.log('DEBUG submit: lid='+lid, 'teams='+JSON.stringify(allStatuses));
+
     if(slot){
       slot = parseInt(slot);
-      const lg = leagueData.leagues[lid];
       let found = false;
       lg.teams.forEach(t=>{
         if(t.slot===slot){ t.name=teamName; t.owner=ownerName; t.status='claimed'; found=true; }
@@ -306,13 +309,11 @@ h2{font-size:1.25rem;margin-bottom:12px}
         return;
       }
     } else {
-      const lg = leagueData.leagues[lid];
       const open = lg.teams.filter(t=>t.status==='open');
       if(!open.length){ showToast('No open slots in this league.','error'); return; }
       const t = open[0]; t.name=teamName; t.owner=ownerName; t.status='claimed'; slot=t.slot;
     }
 
-    const lg = leagueData.leagues[lid];
     const team = lg.teams.find(t=>t.slot===slot);
     if(!team){
       showToast('Could not find team slot.','error');
@@ -320,6 +321,8 @@ h2{font-size:1.25rem;margin-bottom:12px}
     }
     team.id=TEAM_ID; team.league=lid; team.teamName=teamName;
     team.pickOrder=slot; team.draftComplete=false; team.draftedModels=[];
+
+    console.log('DEBUG: team created:', JSON.stringify(team));
 
     buildDraftUI(); showDraft();
     showToast('Draft started!','success');
